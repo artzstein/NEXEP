@@ -1,0 +1,100 @@
+import React from 'react'
+import { Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import Nav from './Components/Nav'
+import JobCard from './Components/JobCard'
+import PostJob from './Components/PostJob';
+import ApplicationForm from './Components/ApplicationForm';
+import CandidateCard from './Components/CandidateCard';
+import LoginForm from './Components/LoginForm';
+import YourCard from './Components/YourCard'
+import NexepHome from './Components/NexepHome'
+import FresherDashboard from './Components/FresherDashboard';
+import RecuiterDashboard from './Components/RecuiterDashboard';
+import ProtectedRoute from './Components/ProtectedRoute';
+import PostedCard from './Components/PostedCard';
+import JobDetailsPage from './Components/JobDetailsPage';
+import Navbar1 from './Components/Nav1';
+import RedirectIfAuthenticated from './Components/RedirectIfAuthenticated';
+import MyAnalytics from './Components/MyAnalytics';
+
+const pageTransition = {
+  initial: { opacity: 0, scale: 0.95 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.95 },
+  transition: { duration: 0.2, ease: "easeOut" },
+};
+
+function AnimatedPage({ children }) {
+  return (
+    <motion.div
+      initial={pageTransition.initial}
+      animate={pageTransition.animate}
+      exit={pageTransition.exit}
+      transition={pageTransition.transition}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+const App = () => {
+  const location = useLocation();
+  const hideNav = location.pathname === '/login' || location.pathname === '/fresherDashboard' || location.pathname === '/recruiterDashboard' || location.pathname === '/postskills' || location.pathname === '/findskills'  || location.pathname === '/postjobs' || location.pathname === '/findjobs' || location.pathname === '/PostedCard' || location.pathname === '/YourCard' || location.pathname === '/myanalytics' || location.pathname === '/details';
+
+  return (
+    <>
+      {hideNav ? <Navbar1 /> : <Nav />}
+
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path='/' element={<AnimatedPage><NexepHome/></AnimatedPage>}/>
+          <Route path='/findjobs' element={<AnimatedPage><JobCard /></AnimatedPage>} />
+          <Route path='/YourCard' element={<AnimatedPage><YourCard/></AnimatedPage>} />
+          <Route path='/PostedCard' element={<AnimatedPage><PostedCard/></AnimatedPage>} />
+          <Route path='/postjobs' element={<AnimatedPage><PostJob /></AnimatedPage>} />
+          <Route path='/postskills' element={<AnimatedPage><ApplicationForm /></AnimatedPage>} />
+          <Route path='/findskills' element={<AnimatedPage><CandidateCard /></AnimatedPage>} />
+          <Route path='/myanalytics' element={<AnimatedPage><MyAnalytics></MyAnalytics></AnimatedPage>} />
+          <Route path='*' element={<AnimatedPage><h1>Page not found</h1></AnimatedPage>} />
+          <Route
+  path='/login'
+  element={
+    <AnimatedPage>
+      <RedirectIfAuthenticated>
+        <LoginForm />
+      </RedirectIfAuthenticated>
+    </AnimatedPage>
+  }
+/>
+
+<Route path='/details/:id' element={<AnimatedPage><JobDetailsPage/></AnimatedPage>}></Route>
+
+          <Route
+            path='/fresherDashboard'
+            element={
+              <AnimatedPage>
+                <ProtectedRoute allowedRole="FRESHER">
+                  <FresherDashboard />
+                </ProtectedRoute>
+              </AnimatedPage>
+            }
+          />
+
+          <Route
+            path='/recruiterDashboard'
+            element={
+              <AnimatedPage>
+                <ProtectedRoute allowedRole="RECRUITER">
+                  <RecuiterDashboard />
+                </ProtectedRoute>
+              </AnimatedPage>
+            }
+          />
+        </Routes>
+      </AnimatePresence>
+    </>
+  );
+}
+
+export default App
