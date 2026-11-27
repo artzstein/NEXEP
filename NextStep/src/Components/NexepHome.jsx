@@ -269,13 +269,6 @@ export default function NexepHome() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer style={{ borderTop: `1px solid ${LINE}` }}>
-        <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <span className="font-serif text-lg">nexep</span>
-          <p className="text-xs" style={{ color: MUTE }}>© 2026 Nexep. Built for freshers and the people who hire them.</p>
-        </div>
-      </footer>
     </div>
   );
 }

@@ -17,6 +17,7 @@ import JobDetailsPage from './Components/JobDetailsPage';
 import Navbar1 from './Components/Nav1';
 import RedirectIfAuthenticated from './Components/RedirectIfAuthenticated';
 import MyAnalytics from './Components/MyAnalytics';
+import Footer from './Components/Footer';
 
 const pageTransition = {
   initial: { opacity: 0, scale: 0.95 },
@@ -93,6 +94,8 @@ const App = () => {
           />
         </Routes>
       </AnimatePresence>
+
+      <Footer />
     </>
   );
 }

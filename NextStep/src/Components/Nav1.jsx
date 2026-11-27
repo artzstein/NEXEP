@@ -32,9 +32,25 @@ export default function Navbar1({ defaultName = "User" }) {
         .fd-topbar {
           background: #0a0a0a;
           padding: 20px 48px;
-          display: flex;
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
           align-items: center;
-          justify-content: space-between;
+          gap: 12px;
+        }
+        .fd-college {
+          text-align: center;
+          color: #ffffff;
+          font-size: 15px;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+        }
+        @media (max-width: 640px) {
+          .fd-topbar {
+            padding: 14px 16px;
+          }
+          .fd-college {
+            font-size: 12px;
+          }
         }
         .fd-user-wrap {
           position: relative;
@@ -100,9 +116,11 @@ export default function Navbar1({ defaultName = "User" }) {
       `}</style>
 
       <div className="fd-topbar">
-        <Link to="/"><img src={logo} alt="" className='w-22 h-14 rounded' /></Link>
+        <Link to="/" className="justify-self-start"><img src={logo} alt="" className='w-22 h-14 rounded' /></Link>
 
-        <div className="fd-user-wrap" ref={menuRef}>
+        <div className="fd-college">ABES Engineering College</div>
+
+        <div className="fd-user-wrap justify-self-end" ref={menuRef}>
           <button
             type="button"
             className="fd-user-trigger"
