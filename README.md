@@ -64,6 +64,18 @@ npm install
 npm run dev
 ```
 
+<<<<<<< HEAD
+=======
+Open `http://localhost:5173/` in your browser.
+
+To build for production:
+
+```bash
+cd NextStep
+npm run build
+```
+
+>>>>>>> ea58012d0421f7d4985606ed3d6f931466e0169e
 ---
 
 ## Creators
