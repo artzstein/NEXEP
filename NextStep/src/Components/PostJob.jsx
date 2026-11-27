@@ -1,11 +1,10 @@
 import { useContext, useState } from "react";
 import { Briefcase, GraduationCap, Building2, FileText, Send, CheckCircle2, ListChecks, Clock } from "lucide-react";
 import { AppContext } from "../Context/AppContext";
-import axios from "axios";
+import { createStoredJob } from "../utils/localStore";
 
 const ACCENT = "#E8A33D";
 const INK = "#000000";
-const API_URL = import.meta.env.VITE_API_URL;
 
 export default function PostJob() {
   const {
@@ -72,11 +71,8 @@ export default function PostJob() {
     };
 
     try {
-     const res = await axios.post(
-  `${API_URL}/postjobs/${userId}`,
-  newJobs
-);
-      setJob([...job, res.data]);
+      const savedJob = createStoredJob(newJobs, userId);
+      setJob([...job, savedJob]);
 
       setJobType("");
       setPosition("");

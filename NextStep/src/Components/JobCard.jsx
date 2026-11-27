@@ -3,8 +3,7 @@ import { AppContext } from '../Context/AppContext';
 import logo from "../assets/logo.jpeg"
 import { Link } from 'react-router';
 import { TrackView } from './TrackView';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { deleteStoredJob } from '../utils/localStore';
 
 
 const JobCard = () => {
@@ -23,14 +22,8 @@ const JobCard = () => {
 
   const deleteJob = async (id) => {
     try {
-      const res = await fetch(`${API_URL}/postjobs/${id}`, {
-  method: 'DELETE'
-});
-      const data = await res.text(); // your endpoint returns "deleted" as plain text
-      console.log(data);
-
-      
-      setJob(prev => prev.filter(job => job.id !== id));
+      deleteStoredJob(id);
+      setJob(prev => prev.filter(job => String(job.id ?? job._id) !== String(id)));
     } catch (err) {
       console.error('Delete failed:', err);
     }

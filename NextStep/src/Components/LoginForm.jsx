@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { loginUser, signupUser } from "../utils/localStore";
 
-
-const API_URL = import.meta.env.VITE_API_URL;
 const COPY = {
   fresher: {
     letter: "F",
@@ -36,49 +35,35 @@ export default function LoginForm() {
  const handleSubmit = async (e) => {
   e.preventDefault();
 
-  const endpoint = isSignup ? "/api/auth/signup" : "/api/auth/login";
-
   try {
-    const res = await fetch(`${API_URL}${endpoint}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    if (isSignup) {
+      const result = await signupUser({
         username,
         password,
         role: role.toUpperCase(),
-      }),
-    });
-
-    if (!res.ok) {
-      const msg = await res.text();
-      alert(msg || "Something went wrong.");
-      return;
-    }
-
-    if (isSignup) {
-      const message = await res.text();
-      alert(message);
-      setMode("signin");
+      });
+      alert(result.message);
+      if (result.ok) {
+        setMode("signin");
+      }
     } else {
-      const data = await res.json();
+      const result = await loginUser({
+        username,
+        password,
+      });
 
-      if (data.id) {
-        localStorage.setItem(
-          "nexepUser",
-          JSON.stringify({ id: data.id, username: data.username, role: data.role })
-        );
-
-        if (data.role === "FRESHER") {
+      if (result.ok && result.user?.id) {
+        if (result.user.role === "FRESHER") {
           navigate("/fresherDashboard");
-        } else if (data.role === "RECRUITER") {
+        } else if (result.user.role === "RECRUITER") {
           navigate("/recruiterDashboard");
         }
       } else {
-        alert(data.message || "Login failed.");
+        alert(result.message || "Login failed.");
       }
     }
   } catch (err) {
-    alert("Something went wrong. Is the backend running?");
+    alert("Something went wrong.");
     console.error(err);
   }
 };

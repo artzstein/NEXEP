@@ -1,7 +1,5 @@
-import axios from "axios";
-import React, { createContext , useState , useRef, useEffect} from "react";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import React, { createContext, useState, useEffect } from "react";
+import { getStoredJobs, getStoredSkills } from "../utils/localStore";
 
 export const AppContext = createContext();
 
@@ -17,7 +15,7 @@ const years = Array.from({ length: 7 }, (_, i) => 2024 + i);
 
 
 export const AppProvider = ({ children }) => {
-  const [job, setJob] = useState([]);
+  const [job, setJob] = useState(() => getStoredJobs());
 
   const[position,setPosition]=useState("");
   const[name,setName]=useState("");
@@ -30,7 +28,7 @@ export const AppProvider = ({ children }) => {
   const [companyBrief, setCompanyBrief] = useState("");
   const [duration, setDuration] = useState("");
 
-  const [candidates, setCandidates] = useState([]);
+  const [candidates, setCandidates] = useState(() => getStoredSkills());
  const [skill, setSkills] = useState([]);
  const [uname, setUName] = useState("");
  const [mobile, setMobile] = useState("");
@@ -59,16 +57,6 @@ useEffect(() => {
   localStorage.setItem("nexepTemplates", JSON.stringify(templates));
 }, [templates]);
   const [passoutYear, setPassoutYear] = useState("");
-
-useEffect(() => {
-    axios.get(`${API_URL}/getjobs`)
-      .then(res => setJob(res.data));
-  }, []);
-
- useEffect(()=>{
-  axios.get(`${API_URL}/getskills`)
-  .then(res=>setCandidates(res.data));
- },[])
 
   return (
     <AppContext.Provider value={{

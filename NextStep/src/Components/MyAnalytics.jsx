@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
+import { getAnalyticsLocal } from "../utils/localStore";
 
-
-const API_BASE = import.meta.env.VITE_API_URL;
 const USE_MOCK = false;
 
 const MOCK = {
@@ -61,10 +60,12 @@ function useAnalytics(user, range) {
       return () => { cancelled = true; clearTimeout(t); };
     }
 
-    fetch(`${API_BASE}/analytics/${kind.toLowerCase()}/${userId}?range=${range}`)
-      .then((r) => { if (!r.ok) throw new Error(`Server returned ${r.status}`); return r.json(); })
-      .then((data) => !cancelled && setState({ data, loading: false, error: "" }))
-      .catch((e) => !cancelled && setState({ data: null, loading: false, error: e.message }));
+    try {
+      const data = getAnalyticsLocal(kind, userId, range);
+      if (!cancelled) setState({ data, loading: false, error: "" });
+    } catch (e) {
+      if (!cancelled) setState({ data: null, loading: false, error: e.message });
+    }
     return () => { cancelled = true; };
   }, [kind, userId, range]);
 

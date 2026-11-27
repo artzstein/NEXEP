@@ -11,9 +11,8 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { AppContext } from "../Context/AppContext";
-import axios from "axios";
+import { applyToJobLocal, getCurrentUser, hasAppliedToJobLocal } from "../utils/localStore";
 
-const API_URL = import.meta.env.VITE_API_URL;
 const INK = "#1c1c1a";
 const CREAM = "#f0efe8";
 const ACCENT = "#E8A33D";
@@ -36,14 +35,17 @@ export default function JobDetailsPage({ jobId, jobProp }) {
   const { id: routeId } = useParams();
   const navigate = useNavigate();
 
-  const [isApplying, setIsApplying] = useState(false);
-  const [hasApplied, setHasApplied] = useState(false);
-
   const targetId = jobId ?? routeId;
 
   const selectedJob =
     jobProp ??
     job.find((j) => String(j.id ?? j._id) === String(targetId));
+
+  const currentUser = getCurrentUser();
+  const [isApplying, setIsApplying] = useState(false);
+  const [hasApplied, setHasApplied] = useState(() =>
+    hasAppliedToJobLocal(selectedJob?.id ?? selectedJob?._id ?? targetId, currentUser?.id)
+  );
 
   if (!selectedJob) {
     return (
@@ -85,8 +87,7 @@ export default function JobDetailsPage({ jobId, jobProp }) {
 
     setIsApplying(true);
     try {
-      // TODO: wire this up once the apply endpoint exists on the backend, e.g.
-      // await axios.post(`${API_URL}/applyjob/${jobIdForApply}/${userId}`);
+      applyToJobLocal(jobIdForApply, userId);
       setHasApplied(true);
     } catch (err) {
       console.error("Error applying to job:", err);

@@ -14,12 +14,11 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AppContext } from "../Context/AppContext";
-import axios from "axios";
+import { createStoredSkill } from "../utils/localStore";
 import Navbar1 from "./Nav1";
 
 const ACCENT = "#E8A33D";
 const INK = "#000000";
-const API_URL = import.meta.env.VITE_API_URL;
 
 
 export default function ApplicationForm() {
@@ -134,25 +133,21 @@ export default function ApplicationForm() {
     }
     const { id: userId } = JSON.parse(storedUser);
 
-    const formData = new FormData();
-    formData.append("userId", userId);
-    formData.append("username", uname);
-    formData.append("mobileno", mobile);
-    formData.append("uemail", email);
-    formData.append("ustatus", status);
-    formData.append("applyingf", apply);
-    formData.append("upassoutYear", passoutYear);
-
-    skill.forEach((s) => formData.append("uskills", s));
-
-    if (resume) formData.append("resume", resume);
-    if (video) formData.append("video", video);
-
-    axios
-      axios
-  .post(`${API_URL}/postskills/upload`, formData)
-      .then((res) => {
-        setCandidates([...candidates, res.data]);
+    createStoredSkill(
+      {
+        userId,
+        username: uname,
+        mobileno: mobile,
+        uemail: email,
+        ustatus: status,
+        applyingf: apply,
+        upassoutYear: passoutYear,
+        uskills: skill,
+      },
+      { resume, video }
+    )
+      .then((saved) => {
+        setCandidates([...candidates, saved]);
 
         setApply("");
         setUName("");

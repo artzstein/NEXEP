@@ -1,17 +1,9 @@
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { recordSkillViewLocal } from "../utils/localStore";
 
 export function trackSkillView(skillId) {
-  let user = {};
   try {
-    user = JSON.parse(localStorage.getItem("nexepUser") || "{}");
+    recordSkillViewLocal(skillId);
   } catch {
-    return;
+    // ignore tracking failures
   }
-  if (!user.id || user.role !== "RECRUITER") return;
-
-  axios
-    .post(`${API_URL}/skills/${skillId}/view`, null, { params: { viewerId: user.id } })
-    .catch(() => {});
 }

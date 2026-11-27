@@ -1,23 +1,15 @@
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { recordJobViewLocal } from "../utils/localStore";
 
 /**
  * Call when a candidate clicks "View details".
  * Fire-and-forget: a failed count must never block opening the job.
  */
 export function TrackView(jobId) {
-  let user = {};
   try {
-    user = JSON.parse(localStorage.getItem("nexepUser") || "{}");
+    recordJobViewLocal(jobId);
   } catch {
-    return;
+    // ignore tracking failures
   }
-  if (!user.id || user.role === "RECRUITER") return;
-
-  axios
-    .post(`${API_URL}/jobs/${jobId}/view`, null, { params: { userId: user.id } })
-    .catch(() => { });
 }
 
 /* Usage in your job card:

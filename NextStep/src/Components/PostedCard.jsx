@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import { AppContext } from '../Context/AppContext';
 import logo from "../assets/logo.jpeg";
+import { deleteStoredJob } from "../utils/localStore";
 
-const API_URL = import.meta.env.VITE_API_URL;
 const PostedCard = () => {
   const { job, setJob } = useContext(AppContext);
 
@@ -28,10 +28,8 @@ const PostedCard = () => {
 
   const deleteJob = async (id) => {
     try {
-     const res = await fetch(`${API_URL}/postjobs/${id}`, { method: 'DELETE' });
-      const data = await res.text();
-      console.log(data);
-      setJob(prev => prev.filter(j => j.id !== id));
+      deleteStoredJob(id);
+      setJob(prev => prev.filter(j => String(j.id ?? j._id) !== String(id)));
     } catch (err) {
       console.error('Delete failed:', err);
     }

@@ -2,10 +2,11 @@ import { useContext, useState } from "react";
 import { AppContext } from "../Context/AppContext";
 import { trackSkillView } from "../Components/trackSkillView";
 import { User, Phone, GraduationCap, Briefcase, FileText, Video, Check, Send } from "lucide-react";
+import { getCurrentUser, sendOfferLocal } from "../utils/localStore";
+import { useSkillFileUrl } from "../utils/useSkillFileUrl";
 
 const ACCENT = "#E8A33D";
 const INK = "#000000";
-const API_URL = import.meta.env.VITE_API_URL;
 
 export default function CandidateCard() {
   const { candidates } = useContext(AppContext);
@@ -30,17 +31,14 @@ export default function CandidateCard() {
     setSendingMap((prev) => ({ ...prev, [key]: true }));
 
     try {
-     const res = await fetch(`${API_URL}/sended`,  {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          toEmail: candidate.uemail,
-          subject,
-          body,
-        }),
+      const currentUser = getCurrentUser();
+      sendOfferLocal({
+        candidateId: key,
+        toEmail: candidate.uemail,
+        subject,
+        body,
+        recruiterId: currentUser?.id,
       });
-      const data = await res.text();
-      console.log(data);
       setOfferSentMap((prev) => ({ ...prev, [key]: true }));
     } catch (err) {
       console.error("Send failed:", err);
@@ -222,14 +220,14 @@ function AttachmentRow({ icon, label, file }) {
 
 function ResumeRow({ candidate }) {
   const hasResume = !!candidate.resumeName;
-  const url = `${API_URL}/skills/${candidate.id}/resume`;
+  const url = useSkillFileUrl(candidate.id, "resume", hasResume);
 
   return (
     <div className="flex items-center justify-between">
       <span className="flex items-center gap-1.5 text-gray-400">
         <FileText size={15} /> Resume
       </span>
-      {hasResume ? (
+      {hasResume && url ? (
         <a
           href={url}
           target="_blank"
@@ -240,6 +238,10 @@ function ResumeRow({ candidate }) {
         >
           {candidate.resumeName}
         </a>
+      ) : hasResume ? (
+        <span className="font-medium text-right truncate max-w-[160px]" style={{ color: "#E8A33D" }}>
+          {candidate.resumeName}
+        </span>
       ) : (
         <span className="font-medium text-right" style={{ color: "#000" }}>
           Not provided
@@ -252,7 +254,7 @@ function ResumeRow({ candidate }) {
 function VideoRow({ candidate }) {
   const [showVideo, setShowVideo] = useState(false);
   const hasVideo = !!candidate.videoName;
-  const url = `${API_URL}/skills/${candidate.id}/video`;
+  const url = useSkillFileUrl(candidate.id, "video", hasVideo && showVideo);
 
   return (
     <div>
@@ -278,7 +280,7 @@ function VideoRow({ candidate }) {
           </span>
         )}
       </div>
-      {showVideo && hasVideo && (
+      {showVideo && hasVideo && url && (
         <video controls className="w-full mt-2 rounded-lg">
           <source src={url} type={candidate.videoType} />
         </video>

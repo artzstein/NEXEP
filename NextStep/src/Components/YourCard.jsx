@@ -1,11 +1,12 @@
 import { useContext ,useState} from "react";
 import { AppContext } from "../Context/AppContext";
 import { User, Phone, GraduationCap, Briefcase, FileText, Video, Check, Send } from "lucide-react";
+import { deleteStoredSkill } from "../utils/localStore";
+import { useSkillFileUrl } from "../utils/useSkillFileUrl";
 
 
 const ACCENT = "#E8A33D";
 const INK = "#000000";
-const API_URL = import.meta.env.VITE_API_URL;
 
 export default function YourCard() {
   const { candidates, setCandidates } = useContext(AppContext);
@@ -15,12 +16,7 @@ export default function YourCard() {
 
   const deleteSkill = async (id) => {
     try {
-      const res = await fetch(`${API_URL}/skills/${id}`, {
-  method: 'DELETE'
-});
-      const data = await res.text();
-      console.log("Delete response:", data);
-
+      await deleteStoredSkill(id);
       setCandidates(prev => prev.filter(c => String(c._id || c.id) !== String(id)));
     } catch (err) {
       console.error('Delete failed:', err);
@@ -171,14 +167,14 @@ function Row({ icon, label, value }) {
 
 function ResumeRow({ candidate }) {
   const hasResume = !!candidate.resumeName;
-  const url = `${API_URL}/skills/${candidate.id}/resume`;
+  const url = useSkillFileUrl(candidate.id, "resume", hasResume);
 
   return (
     <div className="flex items-center justify-between">
       <span className="flex items-center gap-1.5 text-gray-400">
         <FileText size={15} /> Resume
       </span>
-      {hasResume ? (
+      {hasResume && url ? (
         <a
           href={url}
           target="_blank"
@@ -188,6 +184,10 @@ function ResumeRow({ candidate }) {
         >
           {candidate.resumeName}
         </a>
+      ) : hasResume ? (
+        <span className="font-medium text-right truncate max-w-[160px]" style={{ color: "#E8A33D" }}>
+          {candidate.resumeName}
+        </span>
       ) : (
         <span className="font-medium text-right" style={{ color: "#000" }}>
           Not provided
@@ -200,7 +200,7 @@ function ResumeRow({ candidate }) {
 function VideoRow({ candidate }) {
   const [showVideo, setShowVideo] = useState(false);
   const hasVideo = !!candidate.videoName;
-  const url = `${API_URL}/skills/${candidate.id}/video`;
+  const url = useSkillFileUrl(candidate.id, "video", hasVideo && showVideo);
 
   return (
     <div>
@@ -223,7 +223,7 @@ function VideoRow({ candidate }) {
           </span>
         )}
       </div>
-      {showVideo && hasVideo && (
+      {showVideo && hasVideo && url && (
         <video controls className="w-full mt-2 rounded-lg">
           <source src={url} type={candidate.videoType} />
         </video>
